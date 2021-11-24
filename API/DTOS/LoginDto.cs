@@ -10,7 +10,6 @@ namespace API.DTOS
     {
 
         [Required]
-        
         public string Username { get; set; }
 
         [Required]
