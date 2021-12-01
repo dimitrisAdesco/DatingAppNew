@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -26,6 +27,13 @@ namespace API.Entities
         public string City { get; set; }
         public string Country { get; set; }
         public ICollection<Photo> Photos { get; set; }
+
+        public ICollection<UserLike> LikedByUsers { get; set; }
+
+        public ICollection<UserLike> LikedUsers { get; set; }
+
+
+
 
         // public int GetAge()
         // {

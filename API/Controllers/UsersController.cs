@@ -1,18 +1,12 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using API.Data;
 using API.DTOS;
-using API.Entities;
 using API.Extentions;
 using API.Helpers;
 using API.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
@@ -33,6 +27,10 @@ namespace API.Controllers
         {
             // var users = await _context.Users.ToListAsync();
             // return users;
+
+            // var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+
+            // userParams.CurrentUsername = user.Username;   //User.GetUsername();
 
             var users = await _userRepository.GetMembersAsync(userParams);
 
@@ -59,7 +57,7 @@ namespace API.Controllers
         [HttpPut]
         public async Task<ActionResult> UpdateUser(MemberUpdateDto memberUpdateDto)
         {
-            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var username = User.GetUsername();   //var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var user = await _userRepository.GetUserByUsernameAsync(username);
 
             _mapper.Map(memberUpdateDto, user);

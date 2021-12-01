@@ -24,6 +24,7 @@ namespace API.Extentions
 
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IUserRepo, UserRepo>();
+            services.AddScoped<ILikesRepo, LikesRepo>();
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);   //goes and finds the profiles
 
 

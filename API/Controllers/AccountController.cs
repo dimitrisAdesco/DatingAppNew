@@ -35,7 +35,7 @@ namespace API.Controllers
                 return BadRequest("Username is taken");   //BadRequest mporoume na to xrisimopoiisoume apo ActionResult
             }
 
-            var user = _mapper.Map<AppUser>(registerDto);
+            var user = _mapper.Map<AppUser>(registerDto); //from registerDto
 
             using var hmac = new HMACSHA512();   //as soon as we are finished with HMACSHA512 its gonna dispose it (me to using)
 
@@ -50,7 +50,8 @@ namespace API.Controllers
             {
                 Username = user.Username,
                 Token = _tokenService.CreateToken(user),
-                KnownAs = user.KnownAs
+                KnownAs = user.KnownAs,
+                Gender = user.Gender
 
             };
         }
@@ -61,7 +62,9 @@ namespace API.Controllers
         public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
         {
             //1st we need the user from the Database
-            var user = await _context.Users.SingleOrDefaultAsync(p => p.Username == loginDto.Username);
+            var user = await _context.Users
+                .Include(p => p.Photos)
+                .SingleOrDefaultAsync(p => p.Username == loginDto.Username);
 
             if (user == null)
             {
@@ -84,7 +87,9 @@ namespace API.Controllers
             {
                 Username = user.Username,
                 Token = _tokenService.CreateToken(user),
-                KnownAs = user.KnownAs
+                PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url,
+                KnownAs = user.KnownAs,
+                Gender = user.Gender
             };
 
         }

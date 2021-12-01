@@ -29,11 +29,10 @@ namespace API.Data
                 .Where(x => x.Username == username)                                                                                                              // .Where(x => x.Username == username)
                 .ProjectTo<MemberDto>(_mapper.ConfigurationProvider) //ConfigurationProvider the config we provided in our automapperprofiles                    // .Select(user => new MemberDto
                 .SingleOrDefaultAsync();                                                                                                                        // {
-        }                                                                                                                                                        //     Id = user.Id,             //manually mapping the properties
-                                                                                                                                                                 //     Username = user.Username
-                                                                                                                                                             // }).SingleOrDefaultAsync(); // ---> this is where we exec our query
+        }                                                                                                                                                        //     Id = user.Id,             //manually mapping the properties                                                                                                                                                                 //     Username = user.Username
+                                                                                                                                                               // }).SingleOrDefaultAsync(); // ---> this is where we exec our query
 
-        public async Task<PagedList<MemberDto>> GetMembersAsync(UserParams userParams)
+        public async Task<PagedList<MemberDto>> GetMembersAsync(UserParams userParams)   // e.x: {{url}}api/users?PageNumber=1&pageSize=2
         {
             var query = _context.Users                                          // return await _context.Users
                 .ProjectTo<MemberDto>(_mapper.ConfigurationProvider)            //.ProjectTo<MemberDto>(_mapper.ConfigurationProvider) //project to gia olous tous users
