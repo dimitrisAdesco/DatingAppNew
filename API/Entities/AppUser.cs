@@ -1,10 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using API.Extentions;
 
 namespace API.Entities
 {
@@ -27,10 +23,10 @@ namespace API.Entities
         public string City { get; set; }
         public string Country { get; set; }
         public ICollection<Photo> Photos { get; set; }
-
         public ICollection<UserLike> LikedByUsers { get; set; }
-
         public ICollection<UserLike> LikedUsers { get; set; }
+        public ICollection<Message> MessagesSent { get; set; }
+        public ICollection<Message> MessagesReceived { get; set; }
 
 
 

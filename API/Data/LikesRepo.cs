@@ -12,7 +12,7 @@ namespace API.Data
 {
     public class LikesRepo : ILikesRepo
     {
-        public DataContext _context { get; }
+        public DataContext _context;
         public LikesRepo(DataContext context)
         {
             _context = context;
