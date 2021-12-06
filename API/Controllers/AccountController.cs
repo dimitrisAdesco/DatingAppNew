@@ -37,18 +37,14 @@ namespace API.Controllers
 
             var user = _mapper.Map<AppUser>(registerDto); //from registerDto
 
-            using var hmac = new HMACSHA512();   //as soon as we are finished with HMACSHA512 its gonna dispose it (me to using)
-
-            user.Username = registerDto.Username.ToLower();
-            user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password));
-            user.PasswordSalt = hmac.Key;
+            user.UserName = registerDto.Username.ToLower();
 
             _context.Users.Add(user);   //we are not actually adding to the Database, we are tracking
             await _context.SaveChangesAsync();   //now we save it
 
             return new UserDto
             {
-                Username = user.Username,
+                Username = user.UserName,
                 Token = _tokenService.CreateToken(user),
                 KnownAs = user.KnownAs,
                 Gender = user.Gender
@@ -64,28 +60,16 @@ namespace API.Controllers
             //1st we need the user from the Database
             var user = await _context.Users
                 .Include(p => p.Photos)
-                .SingleOrDefaultAsync(p => p.Username == loginDto.Username);
+                .SingleOrDefaultAsync(p => p.UserName == loginDto.Username);
 
             if (user == null)
             {
                 return Unauthorized("Invalid User");
             }
 
-            using var hmac = new HMACSHA512(user.PasswordSalt);
-
-            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDto.Password));
-
-            for (int i = 0; i < computedHash.Length; i++)
-            {
-                if (computedHash[i] != user.PasswordHash[i])
-                {
-                    return Unauthorized("Invalid Password");
-                }
-            }
-
             return new UserDto
             {
-                Username = user.Username,
+                Username = user.UserName,
                 Token = _tokenService.CreateToken(user),
                 PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url,
                 KnownAs = user.KnownAs,
@@ -96,7 +80,7 @@ namespace API.Controllers
 
         private async Task<bool> UserExists(string username)
         {
-            return await _context.Users.AnyAsync(p => p.Username == username.ToLower());
+            return await _context.Users.AnyAsync(p => p.UserName == username.ToLower());
         }
 
     }

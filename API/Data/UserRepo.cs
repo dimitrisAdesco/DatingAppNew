@@ -26,11 +26,11 @@ namespace API.Data
         public async Task<MemberDto> GetMemberAsync(string username)
         {
             return await _context.Users
-                .Where(x => x.Username == username)                                                                                                              // .Where(x => x.Username == username)
+                .Where(x => x.UserName == username)                                                                                                              // .Where(x => x.Username == username)
                 .ProjectTo<MemberDto>(_mapper.ConfigurationProvider) //ConfigurationProvider the config we provided in our automapperprofiles                    // .Select(user => new MemberDto
                 .SingleOrDefaultAsync();                                                                                                                        // {
         }                                                                                                                                                        //     Id = user.Id,             //manually mapping the properties                                                                                                                                                                 //     Username = user.Username
-                                                                                                                                                               // }).SingleOrDefaultAsync(); // ---> this is where we exec our query
+                                                                                                                                                                 // }).SingleOrDefaultAsync(); // ---> this is where we exec our query
 
         public async Task<PagedList<MemberDto>> GetMembersAsync(UserParams userParams)   // e.x: {{url}}api/users?PageNumber=1&pageSize=2
         {
@@ -49,7 +49,7 @@ namespace API.Data
         {
             return await _context.Users
                 .Include(p => p.Photos)
-                .SingleOrDefaultAsync(p => p.Username == username);
+                .SingleOrDefaultAsync(p => p.UserName == username);
         }
 
         public async Task<IEnumerable<AppUser>> GetUsersAsync()
