@@ -22,6 +22,7 @@ namespace API.Controllers
             _mapper = mapper;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers([FromQuery] UserParams userParams) //userParams -> query string parameters
         {
@@ -42,7 +43,8 @@ namespace API.Controllers
 
         }
 
-        [HttpGet("{username}")]
+        [Authorize(Roles = "Member")]
+        [HttpGet("{username}", Name = "GetUser")]
         public async Task<ActionResult<MemberDto>> GetUser(string username)
         {
             // var user = await _context.Users.FindAsync(id);
@@ -69,9 +71,6 @@ namespace API.Controllers
                 return NoContent();
             }
             return BadRequest("failed to update user");
-
-
         }
-
     }
 }
