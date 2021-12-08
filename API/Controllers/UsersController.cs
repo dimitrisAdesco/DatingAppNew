@@ -13,12 +13,12 @@ namespace API.Controllers
     [Authorize]     //auth user, we need to add a middleware for this
     public class UsersController : BaseApiController
     {
-        private readonly IUserRepo _userRepository;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public UsersController(IUserRepo userRepository, IMapper mapper)
+        public UsersController(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _userRepository = userRepository;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
 
@@ -29,11 +29,18 @@ namespace API.Controllers
             // var users = await _context.Users.ToListAsync();
             // return users;
 
-            // var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+            var gender = await _unitOfWork.UserRepo.GetUserGender(User.GetUsername());
 
-            // userParams.CurrentUsername = user.Username;   //User.GetUsername();
+            //var user = await _unitOfWork.UserRepo.GetUserByUsernameAsync(User.GetUsername());
 
-            var users = await _userRepository.GetMembersAsync(userParams);
+            userParams.CurrentUsername = User.GetUsername();   //User.GetUsername();
+
+            // var users = await _unitOfWork.UserRepo.GetMembersAsync(userParams);
+
+            if (string.IsNullOrEmpty(userParams.Gender))
+                userParams.Gender = gender == "male" ? "female" : "male";
+
+            var users = await _unitOfWork.UserRepo.GetMembersAsync(userParams);
 
             Response.AddPaginationHeader(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
 
@@ -50,7 +57,7 @@ namespace API.Controllers
             // var user = await _context.Users.FindAsync(id);
             // return user;
 
-            var user = await _userRepository.GetMemberAsync(username);  // _userRepository.GetUserByUsernameAsync(username)
+            var user = await _unitOfWork.UserRepo.GetMemberAsync(username);  // _userRepository.GetUserByUsernameAsync(username)
 
             return user;    //_mapper.Map<MemberDto>(user);
 
@@ -60,16 +67,22 @@ namespace API.Controllers
         public async Task<ActionResult> UpdateUser(MemberUpdateDto memberUpdateDto)
         {
             var username = User.GetUsername();   //var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var user = await _userRepository.GetUserByUsernameAsync(username);
+            var user = await _unitOfWork.UserRepo.GetUserByUsernameAsync(username);
 
             _mapper.Map(memberUpdateDto, user);
 
-            _userRepository.Update(user);
+            _unitOfWork.UserRepo.Update(user);
 
-            if (await _userRepository.SaveAllAsync())
+            // if (await _userRepository.SaveAllAsync())
+            // {
+            //     return NoContent();
+            // }
+
+            if (await _unitOfWork.Complete())
             {
                 return NoContent();
             }
+
             return BadRequest("failed to update user");
         }
     }

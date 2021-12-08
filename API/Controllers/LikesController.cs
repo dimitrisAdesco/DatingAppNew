@@ -15,20 +15,20 @@ namespace API.Controllers
     [Authorize]
     public class LikesController : BaseApiController
     {
-        private readonly IUserRepo _userRepo;
-        private readonly ILikesRepo _likesRepo;
-        public LikesController(IUserRepo userRepo, ILikesRepo likesRepo)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public LikesController(IUnitOfWork unitOfWork)
         {
-            _likesRepo = likesRepo;
-            _userRepo = userRepo;
+            _unitOfWork = unitOfWork;
+
         }
 
         [HttpPost("{username}")]
         public async Task<ActionResult> AddLike(string username)
         {
             var sourceUserId = User.GetUserId();
-            var likedUser = await _userRepo.GetUserByUsernameAsync(username);
-            var sourceUser = await _likesRepo.GetUserWithLikes(sourceUserId);
+            var likedUser = await _unitOfWork.UserRepo.GetUserByUsernameAsync(username);
+            var sourceUser = await _unitOfWork.LikesRepo.GetUserWithLikes(sourceUserId);
 
             if (likedUser == null)
             {
@@ -40,7 +40,7 @@ namespace API.Controllers
                 return BadRequest("cant like urself");
             }
 
-            var userLike = await _likesRepo.GetUserLike(sourceUserId, likedUser.Id);
+            var userLike = await _unitOfWork.LikesRepo.GetUserLike(sourceUserId, likedUser.Id);
 
             if (userLike != null)
             {
@@ -55,7 +55,10 @@ namespace API.Controllers
 
             sourceUser.LikedUsers.Add(userLike); //add the user like
 
-            if (await _userRepo.SaveAllAsync())
+            // if (await _userRepo.SaveAllAsync())
+            //     return Ok();
+
+            if (await _unitOfWork.Complete())
                 return Ok();
 
             return BadRequest("failed to like user");
@@ -64,7 +67,7 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<LikeDto>>> GetUserLikes(string predicate)
         {
-            var users = await _likesRepo.GetUserLikes(predicate, User.GetUserId());
+            var users = await _unitOfWork.LikesRepo.GetUserLikes(predicate, User.GetUserId());
 
             return Ok(users);
         }

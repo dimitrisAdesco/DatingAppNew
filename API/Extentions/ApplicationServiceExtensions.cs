@@ -23,9 +23,7 @@ namespace API.Extentions
                });
 
             services.AddScoped<ITokenService, TokenService>();
-            services.AddScoped<IUserRepo, UserRepo>();
-            services.AddScoped<ILikesRepo, LikesRepo>();
-            services.AddScoped<IMessageRepo, MessageRepo>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);   //goes and finds the profiles
 
 
@@ -34,3 +32,9 @@ namespace API.Extentions
 
     }
 }
+
+
+//Anti gia auta -> UoW
+// services.AddScoped<IUserRepo, UserRepo>();
+// services.AddScoped<ILikesRepo, LikesRepo>();
+// services.AddScoped<IMessageRepo, MessageRepo>();
